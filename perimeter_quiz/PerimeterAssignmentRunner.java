@@ -4,42 +4,69 @@ import edu.duke.*;
 import java.io.File;
 
 public class PerimeterAssignmentRunner {
-    public double getPerimeter (Shape s) {
-        // Start with totalPerim = 0
-        double totalPerim = 0.0;
+    public double getPerimeter (Shape shape) {
+        // Start with totalPerimeter = 0
+        double totalPerimeter = 0.0;
         // Start wth prevPt = the last point 
-        Point prevPt = s.getLastPoint();
+        Point previousPoint = shape.getLastPoint();
         // For each point currPt in the shape,
-        for (Point currPt : s.getPoints()) {
-            // Find distance from prevPt point to currPt 
-            double currDist = prevPt.distance(currPt);
-            // Update totalPerim by currDist
-            totalPerim = totalPerim + currDist;
-            // Update prevPt to be currPt
-            prevPt = currPt;
+        for (Point currentPoint : shape.getPoints()) {
+            // Find distance from previousPoint point to currentPoint
+            double currentDistance = previousPoint.distance(currentPoint);
+            // Update totalPerimeter by currentDistance
+            totalPerimeter = totalPerimeter + currentDistance;
+            // Update previousPoint to be currentPoint
+            previousPoint = currentPoint;
         }
-        // totalPerim is the answer
-        return totalPerim;
+        // totalPerimeter is the answer
+        return totalPerimeter;
     }
 
-    public int getNumPoints (Shape s) {
-        // Put code here
-        return 0;
+    // Assignment 1 task 1
+    public int getNumberOfPoints(Shape shape) {
+        int numberOfPoints = 0;
+
+        for(Point point :shape.getPoints())
+            numberOfPoints++;
+
+        return numberOfPoints;
     }
 
-    public double getAverageLength(Shape s) {
-        // Put code here
-        return 0.0;
+    // Assignment 1 task 2
+    public double getAverageLength(Shape shape) {
+        double avgLengthOfShape = 0.0;
+
+        avgLengthOfShape = getPerimeter(shape) / getNumberOfPoints(shape);
+
+        return avgLengthOfShape;
     }
 
-    public double getLargestSide(Shape s) {
-        // Put code here
-        return 0.0;
+    // Assignment 1 task 3
+    public double getLargestSide(Shape shape) {
+        double largestSideOfShape = 0.0;
+        Point previousPoint = shape.getLastPoint();
+
+        for (Point currentPoint : shape.getPoints()) {
+            double currentLengthOfSide = previousPoint.distance(currentPoint);
+            if(currentLengthOfSide > largestSideOfShape)
+                    largestSideOfShape = currentLengthOfSide;
+            previousPoint = currentPoint;
+        }
+
+        return largestSideOfShape;
     }
 
-    public double getLargestX(Shape s) {
-        // Put code here
-        return 0.0;
+    // Assignment 1 task 4
+    public double getLargestX(Shape shape) {
+        double largestXValue = 0.0;
+
+        for(Point currentPoint : shape.getPoints()) {
+            double currentPointXValue = currentPoint.getX();
+            if ( currentPointXValue > largestXValue)
+                largestXValue = currentPointXValue;
+        }
+
+        return largestXValue;
     }
 
     public double getLargestPerimeterMultipleFiles() {
@@ -55,9 +82,13 @@ public class PerimeterAssignmentRunner {
 
     public void testPerimeter () {
         FileResource fr = new FileResource();
-        Shape s = new Shape(fr);
-        double length = getPerimeter(s);
+        Shape shape = new Shape(fr);
+        double length = getPerimeter(shape);
         System.out.println("perimeter = " + length);
+        System.out.println("Number of Points: "+ getNumberOfPoints(shape));
+        System.out.println("Average Length of Shape: "+getAverageLength(shape));
+        System.out.println("Largest Side of Shape: "+getLargestSide(shape));
+        System.out.println("Largest X Value Of All Points: "+getLargestX(shape) );
     }
     
     public void testPerimeterMultipleFiles() {
