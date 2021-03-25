@@ -11,65 +11,59 @@ public class GladLib {
 	private ArrayList<String> nameList;
 	private ArrayList<String> animalList;
 	private ArrayList<String> timeList;
-	
+	private ArrayList<String> verbList;
+	private ArrayList<String> fruitList;
+	private ArrayList<String> usedWordsList;
+
 	private Random myRandom;
-	
+
 	private static String dataSourceURL = "http://dukelearntoprogram.com/course3/data";
 	private static String dataSourceDirectory = "data";
-	
+
 	public GladLib(){
 		initializeFromSource(dataSourceDirectory);
 		myRandom = new Random();
 	}
-	
+
 	public GladLib(String source){
 		initializeFromSource(source);
 		myRandom = new Random();
 	}
-	
+
 	private void initializeFromSource(String source) {
-		adjectiveList= readIt(source+"/adjective.txt");	
+		adjectiveList= readIt(source+"/adjective.txt");
 		nounList = readIt(source+"/noun.txt");
 		colorList = readIt(source+"/color.txt");
 		countryList = readIt(source+"/country.txt");
-		nameList = readIt(source+"/name.txt");		
+		nameList = readIt(source+"/name.txt");
 		animalList = readIt(source+"/animal.txt");
-		timeList = readIt(source+"/timeframe.txt");		
+		timeList = readIt(source+"/timeframe.txt");
+		verbList = readIt(source+"/verb.txt");
+		fruitList = readIt(source+"/fruit.txt");
+		usedWordsList = new ArrayList<>();
 	}
-	
+
 	private String randomFrom(ArrayList<String> source){
 		int index = myRandom.nextInt(source.size());
 		return source.get(index);
 	}
-	
+
 	private String getSubstitute(String label) {
-		if (label.equals("country")) {
-			return randomFrom(countryList);
-		}
-		if (label.equals("color")){
-			return randomFrom(colorList);
-		}
-		if (label.equals("noun")){
-			return randomFrom(nounList);
-		}
-		if (label.equals("name")){
-			return randomFrom(nameList);
-		}
-		if (label.equals("adjective")){
-			return randomFrom(adjectiveList);
-		}
-		if (label.equals("animal")){
-			return randomFrom(animalList);
-		}
-		if (label.equals("timeframe")){
-			return randomFrom(timeList);
-		}
-		if (label.equals("number")){
-			return ""+myRandom.nextInt(50)+5;
-		}
-		return "**UNKNOWN**";
+		return switch (label) {
+			case "country" -> randomFrom(countryList);
+			case "verb" -> randomFrom(verbList);
+			case "color" -> randomFrom(colorList);
+			case "noun" -> randomFrom(nounList);
+			case "name" -> randomFrom(nameList);
+			case "adjective" -> randomFrom(adjectiveList);
+			case "animal" -> randomFrom(animalList);
+			case "timeframe" -> randomFrom(timeList);
+			case "fruit" -> randomFrom(fruitList);
+			case "number" -> "" + myRandom.nextInt(50) + 5;
+			default -> "**UNKNOWN**";
+		};
 	}
-	
+
 	private String processWord(String w){
 		int first = w.indexOf("<");
 		int last = w.indexOf(">",first);
@@ -79,9 +73,14 @@ public class GladLib {
 		String prefix = w.substring(0,first);
 		String suffix = w.substring(last+1);
 		String sub = getSubstitute(w.substring(first+1,last));
-		return prefix+sub+suffix;
+		while(usedWordsList.contains(sub)){
+			sub = getSubstitute(w.substring(first+1,last));
+		}
+		usedWordsList.add(sub);
+		return prefix + sub + suffix;
+
 	}
-	
+
 	private void printOut(String s, int lineWidth){
 		int charsWritten = 0;
 		for(String w : s.split("\\s+")){
@@ -93,7 +92,7 @@ public class GladLib {
 			charsWritten += w.length() + 1;
 		}
 	}
-	
+
 	private String fromTemplate(String source){
 		String story = "";
 		if (source.startsWith("http")) {
@@ -110,7 +109,7 @@ public class GladLib {
 		}
 		return story;
 	}
-	
+
 	private ArrayList<String> readIt(String source){
 		ArrayList<String> list = new ArrayList<String>();
 		if (source.startsWith("http")) {
@@ -129,11 +128,19 @@ public class GladLib {
 	}
 	
 	public void makeStory(){
+		usedWordsList.clear();
 	    System.out.println("\n");
-		String story = fromTemplate("data/madtemplate.txt");
+		String story = fromTemplate("datalong/madtemplate2.txt");
 		printOut(story, 60);
+		System.out.println("\nNumber Of Words Replaced are :"+usedWordsList.size());
+		System.out.println(usedWordsList);
 	}
-	
+
+	public static void main(String[] args) {
+		GladLib gladLib = new GladLib();
+		gladLib.makeStory();
+
+	}
 
 
 }
