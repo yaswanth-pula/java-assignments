@@ -18,6 +18,13 @@ public class Tester
     }
     
     public void testLogAnalyzer() {
-        // complete method
+        LogAnalyzer logAnalyzer = new LogAnalyzer();
+        logAnalyzer.readFile("src/LogFiles/short-test_log");
+        logAnalyzer.printAll();
+    }
+
+    public static void main(String[] args) {
+        Tester tester = new Tester();
+        tester.testLogAnalyzer();
     }
 }
