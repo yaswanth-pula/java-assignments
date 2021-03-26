@@ -47,13 +47,44 @@ public class Tester
         System.out.println(logAnalyzer.countUniqueIPsInRange(200,299));
         System.out.println(logAnalyzer.countUniqueIPsInRange(300,399));
     }
+    public void testCountVisitsPerIp(){
+        LogAnalyzer logAnalyzer = new LogAnalyzer();
+        logAnalyzer.readFile("src/LogFiles/short-test_log");
+        System.out.println(logAnalyzer.countVisitsPerIP());
+    }
+    public void testMostNumberOfVisit(){
+        LogAnalyzer logAnalyzer = new LogAnalyzer();
+        logAnalyzer.readFile("src/LogFiles/short-test_log");
+        System.out.println(logAnalyzer.mostVisitsCountByIP(logAnalyzer.countVisitsPerIP()));
+    }
+    public void testIpListForDay(){
+        LogAnalyzer logAnalyzer = new LogAnalyzer();
+        logAnalyzer.readFile("src/LogFiles/weblog3-short_log");
+        System.out.println(logAnalyzer.ipListForDaysMap());
+    }
+    public void testdayWithMostIpVisit(){
+        LogAnalyzer logAnalyzer = new LogAnalyzer();
+        logAnalyzer.readFile("src/LogFiles/weblog3-short_log");
+        System.out.println(logAnalyzer.dayWithMostIpVisit(logAnalyzer.ipListForDaysMap()));
+    }
+    public void testIpListWithMostVisitOnDay(){
+        LogAnalyzer logAnalyzer = new LogAnalyzer();
+        logAnalyzer.readFile("src/LogFiles/weblog3-short_log");
+        System.out.println(logAnalyzer.iPsWithMostVisitsOnDay(logAnalyzer.ipListForDaysMap(), "Sep 30"));
+    }
 
     public static void main(String[] args) {
         Tester tester = new Tester();
-//        tester.testLogAnalyzer();
-//        tester.testUniqueIP();
-//        tester.testHigherThanNum();
-//        tester.testUniqueIPOnDay();
-//        tester.testUniqueCountRange();
+        tester.testLogAnalyzer();
+        tester.testUniqueIP();
+        tester.testHigherThanNum();
+        tester.testUniqueIPOnDay();
+        tester.testUniqueCountRange();
+        tester.testCountVisitsPerIp();
+        tester.testMostNumberOfVisit();
+        tester.testIpListForDay();
+        tester.testdayWithMostIpVisit();
+        tester.testIpListWithMostVisitOnDay();
     }
+
 }
