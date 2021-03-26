@@ -20,8 +20,9 @@ public class GrayScaleConverter {
 		DirectoryResource dr = new DirectoryResource();
 		for (File f : dr.selectedFiles()) {
 			ImageResource inImage = new ImageResource(f);
-			ImageResource gray = makeGray(inImage);
-			gray.draw();
+			ImageResource grayImage = makeGray(inImage);
+			grayImage.setFileName("gray-"+inImage.getFileName());
+			grayImage.save();
 		}
 	}
 
@@ -29,5 +30,10 @@ public class GrayScaleConverter {
 		ImageResource ir = new ImageResource();
 		ImageResource gray = makeGray(ir);
 		gray.draw();
+	}
+
+	public static void main(String[] args) {
+		GrayScaleConverter converter = new GrayScaleConverter();
+		converter.selectAndConvert();
 	}
 }
