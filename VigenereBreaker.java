@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.*;
 import edu.duke.*;
 
@@ -26,13 +27,19 @@ public class VigenereBreaker {
     public void breakVigenere () {
         FileResource fileResourceForMessage = new FileResource();
         String encryptedMessage = fileResourceForMessage.asString();
+        HashMap<String,HashSet<String>> languagesWithDictionaryMap  = new HashMap<>();
 
-        FileResource fileResourceForDictionary = new FileResource("src/dictionaries/English");
-        HashSet<String> dictionaryWordSet = readDictionary(fileResourceForDictionary);
+        DirectoryResource directoryResource = new DirectoryResource();
+        for(File dictionaryFile : directoryResource.selectedFiles()){
+            FileResource dictionaryFileResource = new FileResource(dictionaryFile);
+            HashSet<String> dictionaryWordSet = readDictionary(dictionaryFileResource);
 
-        String decryptedMessage = breakForLanguage(encryptedMessage,dictionaryWordSet);
+            String currentLanguageName = dictionaryFile.getName();
+            System.out.println("Reading Completed: "+currentLanguageName);
+            languagesWithDictionaryMap.put(currentLanguageName,dictionaryWordSet);
+        }
 
-        System.out.println("Best Decrypted Message is :\n"+decryptedMessage);
+        breakForAllLanguages(encryptedMessage,languagesWithDictionaryMap);
     }
     public HashSet<String> readDictionary(FileResource fileResource){
             HashSet<String> dictionaryWordSet = new HashSet<>();
@@ -57,8 +64,10 @@ public class VigenereBreaker {
         int maxValidWords = 0;
         String bestDecryptedSoFar = "";
         VigenereCipher vigenereCipher;
-        for(int currentKeyLength = 1; currentKeyLength < 39 ; currentKeyLength++){
-            int[] currentKey = tryKeyLength(encryptedMessage,currentKeyLength,'e');
+        char mostCommonCharacterOfLanguage = mostCommonCharInDictionary(dictionary);
+
+        for(int currentKeyLength = 1; currentKeyLength < 100 ; currentKeyLength++){
+            int[] currentKey = tryKeyLength(encryptedMessage,currentKeyLength,mostCommonCharacterOfLanguage);
             vigenereCipher = new VigenereCipher(currentKey);
             String currentDecryptedMessage = vigenereCipher.decrypt(encryptedMessage);
 
@@ -67,16 +76,56 @@ public class VigenereBreaker {
             if(currentValidWords > maxValidWords){
                 bestDecryptedSoFar = currentDecryptedMessage;
                 maxValidWords = currentValidWords;
-                System.out.println("Best Key Length :"+currentKeyLength);
+
             }
         }
-//        System.out.println("Count of Best Valid Words are"+maxValidWords);
         return bestDecryptedSoFar;
     }
 
+    public char mostCommonCharInDictionary(HashSet<String> dictionary){
+        int[] charFreqCount = new int[26];
+        for(String currentWord : dictionary){
+                currentWord = currentWord.toLowerCase();
+                for(char character : currentWord.toCharArray()) {
+                    if(character >= 97 && character <= 122)
+                        charFreqCount[character - 'a']++;
+                }
+            }
 
-    public static void main(String[] args) {
+        int maxCountIndex = 0;
+        for(int index = 0 ; index < 26; index++)
+                if(charFreqCount[index] > charFreqCount[maxCountIndex]) {
+                    maxCountIndex = index;
+                }
 
-
+        return (char) ('a'+maxCountIndex);
     }
+
+    public void breakForAllLanguages(String encryptedMessage,
+                                     HashMap<String,HashSet<String>> languagesWithDictionaryMap){
+        int maxValidWords = 0;
+        String bestDecryptedMessage="Not Found";
+        String bestLanguage = "NO Language";
+
+        for(String currentLanguage: languagesWithDictionaryMap.keySet()){
+            HashSet<String> currentLanguageDictionary = languagesWithDictionaryMap.get(currentLanguage);
+            String currentDecryptedMessage = breakForLanguage(encryptedMessage,currentLanguageDictionary);
+
+            int validWordsCountForCurrentLanguage = countValidWords(currentDecryptedMessage,currentLanguageDictionary);
+
+            System.out.println("Breaking Completed For Language: "+currentLanguage);
+
+            if(validWordsCountForCurrentLanguage > maxValidWords){
+                maxValidWords = validWordsCountForCurrentLanguage;
+                bestDecryptedMessage = currentDecryptedMessage;
+                bestLanguage = currentLanguage;
+            }
+        }
+
+        System.out.println("------------------------------------------------");
+        System.out.println("Best Language Decryption is : "+bestLanguage);
+        System.out.println("Best Decryted Message is \n"+bestDecryptedMessage);
+        System.out.println("------------------------------------------------");
+    }
+
 }
