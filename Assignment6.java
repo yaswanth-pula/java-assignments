@@ -1,5 +1,4 @@
 import java.util.Arrays;
-import java.util.HashSet;
 
 /**
  * Part 1: A vampire number v is a number with an even number of digits n,
@@ -24,44 +23,67 @@ import java.util.HashSet;
 
 // part 1
 class VampireClass{
-    private  int numDigits(long num){
-        return Long.toString(Math.abs(num)).length();
+
+    public void printVampireNumbers(int numberOfVampires){
+        int foundVampireCount = 0;
+        for(long iterator = 10; foundVampireCount < numberOfVampires; iterator++ ){
+
+            if(isOddNumberOfDigits(iterator)) {
+                iterator = getSeriesLastNumber(iterator);
+                continue;
+            }
+
+            if( isVampire(iterator) ){
+                foundVampireCount++;
+                System.out.println(foundVampireCount+" : "+iterator);
+            }
+        }
     }
 
-    private boolean fangCheck(long original, long fang1, long fang2){
-        if(Long.toString(fang1).endsWith("0") && Long.toString(fang2).endsWith("0")) return false;
+    private boolean isVampire(long iterator){
+        for(long fang1 = 2; fang1 < highestDivisor(iterator); fang1++){
+            if(isDivisible(iterator,fang1)){
+                long fang2 = iterator / fang1;
+                if(isValidFangs(iterator, fang1, fang2) && fang1 <= fang2)
+                    return true;
+            }
+        }
+        return false;
+    }
+    private boolean isValidFangs(long original, long fang1, long fang2){
+        String fang1AsString = Long.toString(fang1);
+        String fang2AsString = Long.toString(fang2);
 
-        int originalLen = numDigits(original);
-        if(numDigits(fang1) != originalLen / 2 || numDigits(fang2) != originalLen / 2) return false;
+        if(hasTrailingZeros(fang1AsString) && hasTrailingZeros(fang2AsString)) return false;
+
+        int originalLength = numDigits(original);
+        if(numDigits(fang1) != originalLength / 2 || numDigits(fang2) != originalLength / 2) return false;
 
         byte[] originalBytes = Long.toString(original).getBytes();
-        byte[] fangBytes = (Long.toString(fang1) + fang2).getBytes();
+        byte[] fangBytes = (fang1AsString + fang2AsString).getBytes();
 
         Arrays.sort(originalBytes);
         Arrays.sort(fangBytes);
 
         return Arrays.equals(originalBytes, fangBytes);
     }
-
-    public void printVampireNumbers(){
-        HashSet<Long> vamps = new HashSet<Long>();
-
-        for(long iterator = 10; vamps.size() < 100; iterator++ ){
-            if((numDigits(iterator) % 2) != 0) {
-                iterator = iterator * 10 - 1;
-                continue;
-            }
-
-            for(long fang1 = 2; fang1 < Math.sqrt(iterator) + 1; fang1++){
-                if(iterator % fang1 == 0){
-                    long fang2 = iterator / fang1;
-                    if(fangCheck(iterator, fang1, fang2) && fang1 <= fang2){
-                        vamps.add(iterator);
-                        System.out.println(vamps.size()+" : "+iterator);
-                    }
-                }
-            }
-        }
+    private  int numDigits(long num){
+        return Long.toString(Math.abs(num)).length();
+    }
+    private boolean isOddNumberOfDigits(long iterator){
+        return (numDigits(iterator) % 2) != 0;
+    }
+    private long getSeriesLastNumber(long iterator){
+        return iterator * 10 - 1;
+    }
+    private long highestDivisor(long iterator){
+        return (long) (Math.sqrt(iterator) + 1);
+    }
+    private boolean isDivisible(long iterator, long fang1){
+        return iterator % fang1 == 0;
+    }
+    private boolean hasTrailingZeros(String fang){
+        return fang.endsWith("0");
     }
 }
 
@@ -92,19 +114,20 @@ public class Assignment6 {
     public static void main(String[] args) {
 //        Part 1
         VampireClass vampire = new VampireClass();
-        vampire.printVampireNumbers();
+        vampire.printVampireNumbers(100);
 //        Part 2
-        Overloaded overloaded = new Overloaded();
+//        Overloaded overloaded = new Overloaded();
+//
+//        ArrayObject[]  objects = new ArrayObject[5];
+////        part 3
+////        prints null as objects
+//        for(int index = 0; index < objects.length ;index ++)
+//            System.out.println(objects[index]);
+//
+////        part 4
+////        prints initialized constructor message
+//        for(int index = 0; index < objects.length ;index ++)
+//            objects[index] = new ArrayObject("Object "+index);
 
-        ArrayObject[]  objects = new ArrayObject[5];
-//        part 3
-//        prints null as objects
-        for(int index = 0; index < objects.length ;index ++)
-            System.out.println(objects[index]);
-
-//        part 4
-//        prints initialized constructor message
-        for(int index = 0; index < objects.length ;index ++)
-            objects[index] = new ArrayObject("Object "+index);
     }
 }
